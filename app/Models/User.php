@@ -29,4 +29,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+// protected $fillable kısmını şu şekilde güncelle
+protected $fillable = [
+    'name',
+    'email',
+    'password',
+    'role',  // ← Bu satırı ekle
+];
+
+// Sınıfın sonuna şu metodu ekle
+public function isAdmin()
+{
+    return $this->role === 'admin';
+}
+
+
 }

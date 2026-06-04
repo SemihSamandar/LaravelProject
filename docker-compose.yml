@@ -1,12 +1,14 @@
+version: "3.8"
+
 services:
     app:
-    image: php:8.3-fpm
-    container_name: laravel_app
-    working_dir: /var/www
-    volumes:
-        - ./:/var/www
-    depends_on:
-        - db
+        image: php:8.3-fpm
+        container_name: laravel_app
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - db
 
     db:
         image: mysql:8
@@ -16,7 +18,7 @@ services:
             MYSQL_DATABASE: laravel
             MYSQL_ROOT_PASSWORD: password
         ports:
-            - "3306:3306"
+            - "3307:3306"
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
