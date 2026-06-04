@@ -74,7 +74,7 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
-            'role' => 'admin', // İlk kullanıcı admin
+            
         ]);
 
         // Otomatik giriş yap
