@@ -12,4 +12,11 @@ class OrderItem extends Model
         'quantity',
         'price',
     ];
+
+    public function product()
+    {
+        // Her sipariş kalemi tek bir ürüne (Product) aittir
+        return $this->belongsTo(Product::class);
+    }
+
 }

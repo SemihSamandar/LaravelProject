@@ -6,7 +6,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminOrderController;
 
-Route::get('/admin/orders', [AdminOrderController::class, 'index']);
+
+
+// Bu satır, sidebar'daki route('admin.orders.index') ifadesinin çalışmasını sağlayacak
+Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
 // ===== PUBLIC ROUTES =====
 
 

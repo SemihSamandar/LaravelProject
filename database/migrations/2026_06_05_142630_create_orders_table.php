@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
+            
+            // Yeni Eklenen Müşteri ve Teslimat Alanları
+            $table->string('customer_name');
+            $table->string('customer_phone');
+            $table->text('customer_address');
+            
             $table->decimal('total_price', 10, 2)->default(0);
             $table->string('status')->default('pending');
             $table->timestamps();

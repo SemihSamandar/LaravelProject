@@ -246,15 +246,21 @@ class CartController extends Controller
     }
 
 
-
-public function checkout()
+public function checkout(Request $request): JsonResponse
 {
     if (!auth()->check()) {
         return response()->json([
             'success' => false,
             'message' => 'Giriş yapmalısınız'
-        ]);
+        ], 401);
     }
+
+    // 1. Formdan gelen teslimat bilgilerini doğrula
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'customer_phone' => 'required|string|max:50',
+        'customer_address' => 'required|string',
+    ]);
 
     $items = ShoppingCart::with('product')
         ->where('user_id', auth()->id())
@@ -264,24 +270,26 @@ public function checkout()
         return response()->json([
             'success' => false,
             'message' => 'Sepet boş'
-        ]);
+        ], 422);
     }
 
     DB::beginTransaction();
 
     try {
-
+        // 2. Siparişi gelen teslimat bilgileriyle birlikte başlatıyoruz
         $order = Order::create([
             'user_id' => auth()->id(),
-            'total_price' => 0,
+            'customer_name' => $validated['customer_name'],
+            'customer_phone' => $validated['customer_phone'],
+            'customer_address' => $validated['customer_address'],
+            'total_price' => 0, // Döngüden sonra güncellenecek
             'status' => 'paid'
         ]);
 
-        $total = 0;
+        $subtotal = 0;
 
         foreach ($items as $item) {
-
-            $total += $item->price * $item->quantity;
+            $subtotal += $item->price * $item->quantity;
 
             OrderItem::create([
                 'order_id' => $order->id,
@@ -289,27 +297,38 @@ public function checkout()
                 'quantity' => $item->quantity,
                 'price' => $item->price
             ]);
+
+            // Stok düşürme işlemi (İsteğe bağlı, eğer product modelinde stok yönetimi varsa)
+            if ($item->product) {
+                $item->product->decrement('stock', $item->quantity);
+            }
         }
 
-        $order->update(['total_price' => $total]);
+        // 3. Frontend tarafındaki maliyet hesaplama mantığının birebir aynısı (TL bazında)
+        $shippingCost = 50;
+        $tax = $subtotal * 0.18;
+        $totalWithExtras = $subtotal + $shippingCost + $tax;
 
+        // Siparişin toplam tutarını net genel toplam ile güncelliyoruz
+        $order->update(['total_price' => $totalWithExtras]);
+
+        // 4. Kullanıcının sepetini temizle
         ShoppingCart::where('user_id', auth()->id())->delete();
 
         DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => 'Sipariş oluşturuldu'
+            'message' => 'Sipariş başarıyla oluşturuldu.'
         ]);
 
     } catch (\Exception $e) {
-
         DB::rollback();
 
         return response()->json([
             'success' => false,
-            'message' => $e->getMessage()
-        ]);
+            'message' => 'Sipariş işlenirken bir hata oluştu: ' . $e->getMessage()
+        ], 500);
     }
 }
 
