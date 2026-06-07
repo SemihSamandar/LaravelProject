@@ -112,16 +112,19 @@ class CartController extends Controller
     /**
      * Sepet öğesini güncelle
      */
-    public function update(Request $request, ShoppingCart $cart): JsonResponse
+    public function update(Request $request, $id): JsonResponse
     {
         try {
             $request->validate([
                 'quantity' => 'required|integer|min:1|max:100',
             ]);
 
+            // Modeli id üzerinden güvenli bir şekilde buluyoruz
+            $cart = \App\Models\ShoppingCart::findOrFail($id);
+
             // Yetkilendirme kontrolü
             if (auth()->check()) {
-                if ($cart->user_id !== auth()->id()) {
+                if ((int)$cart->user_id !== (int)auth()->id()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Bu işlemi yapmaya yetkiniz yok.',
@@ -159,15 +162,18 @@ class CartController extends Controller
         }
     }
 
-    /**
-     * Sepetten ürün kaldır
+   /**
+     * Sepet öğesini kaldır
      */
-    public function remove(ShoppingCart $cart): JsonResponse
+    public function remove(Request $request, $id): JsonResponse
     {
         try {
+            // Modeli id üzerinden güvenli bir şekilde buluyoruz
+            $cart = \App\Models\ShoppingCart::findOrFail($id);
+
             // Yetkilendirme kontrolü
             if (auth()->check()) {
-                if ($cart->user_id !== auth()->id()) {
+                if ((int)$cart->user_id !== (int)auth()->id()) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Bu işlemi yapmaya yetkiniz yok.',
@@ -182,12 +188,12 @@ class CartController extends Controller
                 }
             }
 
-            $productName = $cart->product->name;
+            // Sepet öğesini siliyoruz
             $cart->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => $productName . ' sepetten kaldırıldı.',
+                'message' => 'Ürün sepetten kaldırıldı.'
             ]);
         } catch (\Exception $e) {
             return response()->json([
