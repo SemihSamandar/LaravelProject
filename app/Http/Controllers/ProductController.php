@@ -20,6 +20,8 @@ class ProductController extends Controller
         return view('products.create');
     }
 
+    
+
     // Ürünü veritabanına kaydet
     public function store(Request $request)
     {
@@ -64,12 +66,13 @@ class ProductController extends Controller
         return redirect()->route('products.create')->with('success', '✅ Ürün başarıyla eklendi!');
     }
 
-    // Ürün detaylarını göster (opsiyonel)
-    public function show($id)
-    {
-        $product = Product::findOrFail($id);
-        return view('products.show', compact('product'));
-    }
+    public function show(Product $product)
+{
+    // Laravel'in "Route Model Binding" özelliği sayesinde, 
+    // urldeki ID'ye ait ürün otomatik olarak bulunur ve $product içine yüklenir.
+    
+    return view('products.show', compact('product'));
+}
 
     // Ürün düzenleme formunu göster (opsiyonel)
     public function edit($id)

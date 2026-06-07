@@ -586,7 +586,7 @@
                 <div class="nav-section-title">Ürün Yönetimi</div>
 
                 <a href="{{ route('products.index') }}" class="nav-item">
-                    <span class="nav-item-icon">📦</span>
+                  <span class="nav-item-icon">📦</span>
                     <span class="nav-item-text">Ürünler</span>
                 </a>
 
@@ -595,8 +595,9 @@
                     <span class="nav-item-text">Yeni Ürün Ekle</span>
                 </a>
 
-<a href="{{ route('admin.orders.index') }}">
-    <span>📦 Siparişler</span>
+<a href="{{ route('admin.orders.index') }}" class="nav-item">
+    <span class="nav-item-icon">📦</span>
+    <span class="nav-item-text">Siparişler</span>
 </a>
 
             </div>

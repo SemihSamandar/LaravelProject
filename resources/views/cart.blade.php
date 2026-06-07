@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sepetim - ShopHub</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
@@ -395,7 +397,6 @@
             padding-bottom: 10px;
         }
 
-        /* YENI: Form Alanı Tasarımı */
         .checkout-form {
             margin-bottom: 24px;
         }
@@ -599,7 +600,7 @@
             <a href="/" class="logo">ShopHub</a>
             <div class="nav-links">
                 <a href="/">← Ana Sayfa</a>
-                <a href="#cart">🛒 Sepet</a>
+                <a href="/cart">🛒 Sepet</a>
             </div>
         </nav>
     </header>
@@ -677,11 +678,13 @@
     </div>
 
     <script>
-        const API_BASE = '/api';
+        // GÜNCELLEME: web.php dosyasındaki prefix yapısına göre base url ayarlandı
+        const API_BASE = '/api/cart';
 
         async function loadCart() {
             try {
-                const response = await fetch(`${API_BASE}/cart/`);
+                // GÜNCELLEME: web.php'deki Route::get('/', ...) istek yoluna göre boş '/' atılıyor
+                const response = await fetch(`${API_BASE}`);
                 const result = await response.json();
 
                 const items = result.items ?? [];
@@ -691,7 +694,7 @@
                 const subtotalEl = document.getElementById('subtotal');
                 const totalEl = document.getElementById('total-price');
                 
-                const shippingCost = 50;
+                const shippingCost = items.length > 0 ? 50 : 0; // Sepet boşsa kargo 0 görünsün
                 const tax = total * 0.18;
                 const totalWithExtras = total + shippingCost + tax;
 
@@ -704,6 +707,10 @@
                             <a href="/" class="continue-shopping">Alışverişe Dönün</a>
                         </div>
                     `;
+                    subtotalEl.textContent = '₺0,00';
+                    document.getElementById('shipping').textContent = '₺0,00';
+                    document.getElementById('tax').textContent = '₺0,00';
+                    totalEl.textContent = '₺0,00';
                     return;
                 }
 
@@ -764,6 +771,7 @@
             }
         }
 
+        // GÜNCELLEME: Rota PUT /api/cart/update/{id} yapısına çekildi ve CSRF Token eklendi
         async function updateQuantity(cartId, quantity) {
             if (quantity < 1) {
                 removeItem(cartId);
@@ -771,9 +779,13 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/cart/${cartId}/update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const response = await fetch(`${API_BASE}/update/${cartId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
                     body: JSON.stringify({ quantity }),
                 });
 
@@ -789,10 +801,15 @@
             }
         }
 
+        // GÜNCELLEME: Rota DELETE /api/cart/remove/{id} yapısına çekildi ve CSRF Token eklendi
         async function removeItem(cartId) {
             try {
-                const response = await fetch(`${API_BASE}/cart/${cartId}/remove`, {
+                const response = await fetch(`${API_BASE}/remove/${cartId}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
                 });
 
                 const data = await response.json();
@@ -807,13 +824,12 @@
             }
         }
 
-        /* YENI: Güncellenmiş Checkout Fonksiyonu */
+        // GÜNCELLEME: Rota POST /api/cart/checkout yapısına çekildi ve CSRF Token eklendi
         async function checkout() {
             const name = document.getElementById('customer-name').value.trim();
             const phone = document.getElementById('customer-phone').value.trim();
             const address = document.getElementById('customer-address').value.trim();
 
-            // Basit Form Doğrulaması (Validation)
             if (!name || !phone || !address) {
                 showToast('Lütfen teslimat alanlarının tümünü doldurun.', 'error');
                 return;
@@ -822,10 +838,12 @@
             if (!confirm('Siparişi ve teslimat bilgilerini onaylıyor musunuz?')) return;
 
             try {
-                const response = await fetch(`${API_BASE}/cart/checkout`, {
+                const response = await fetch(`${API_BASE}/checkout`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
                     body: JSON.stringify({
                         customer_name: name,

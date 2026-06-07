@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopHub - Premium Ürünler</title>
+    
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <style>
         * {
             margin: 0;
@@ -179,10 +182,10 @@
             z-index: 1000;
             flex-direction: column;
             transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
         }
 
         .cart-modal.active {
+            display: flex;
             right: 0;
         }
 
@@ -364,6 +367,7 @@
         }
 
         .checkout-btn {
+            display: block;
             width: 100%;
             padding: 14px;
             background: var(--primary);
@@ -374,6 +378,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 12px;
+            text-align: center;
+            text-decoration: none;
         }
 
         .checkout-btn:hover {
@@ -628,40 +634,11 @@
             border-radius: 6px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             z-index: 2000;
-            animation: slideUp 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .toast.error {
             background: var(--danger);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .empty-state h2 {
-            font-size: 32px;
-            color: var(--text-light);
-            margin-bottom: 15px;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            color: var(--text-light);
-            margin-bottom: 30px;
         }
 
         /* ===== FOOTER ===== */
@@ -717,288 +694,102 @@
             opacity: 0.8;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .cart-modal {
-                width: 100%;
-                right: -100%;
-            }
-
-            .hero h1 {
-                font-size: 36px;
-            }
-
-            .hero p {
-                font-size: 16px;
-            }
-
-            .section-header h2 {
-                font-size: 28px;
-            }
-
-            .nav-center {
-                gap: 20px;
-            }
-
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 20px;
-            }
-
-            .admin-btn {
-                padding: 8px 16px;
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            nav {
-                height: auto;
-                padding: 15px 20px;
-                flex-wrap: wrap;
-            }
-
-            .logo {
-                font-size: 20px;
-            }
-
-            .nav-center {
-                width: 100%;
-                flex-direction: column;
-                gap: 15px;
-                margin-top: 15px;
-            }
-
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero {
-                padding: 50px 20px;
-            }
-
-            .hero h1 {
-                font-size: 28px;
-            }
-
-            .cart-modal {
-                width: 100%;
-                right: -100%;
-            }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .product-card {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .product-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .product-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .product-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .product-card:nth-child(n+4) {
-            animation-delay: 0.4s;
+            .cart-modal { width: 100%; right: -100%; }
+            .hero h1 { font-size: 36px; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== CART OVERLAY ===== -->
     <div class="cart-overlay" id="cartOverlay"></div>
 
-    <!-- ===== CART MODAL ===== -->
     <div class="cart-modal" id="cartModal">
         <div class="cart-modal-header">
             <h2>🛒 Sepetim</h2>
             <button class="cart-close-btn" onclick="closeCart()">✕</button>
         </div>
-
-        <div class="cart-content" id="cartContent">
-            <!-- Sepet öğeleri buraya eklenecek -->
-        </div>
-
-        <div class="cart-footer" id="cartFooter">
-            <!-- Toplam ve butonlar buraya eklenecek -->
-        </div>
+        <div class="cart-content" id="cartContent"></div>
+        <div class="cart-footer" id="cartFooter"></div>
     </div>
 
-    <!-- ===== HEADER & NAVIGATION ===== -->
     <header>
         <nav>
             <a href="{{ route('products.index') }}" class="logo">ShopHub</a>
-            
             <ul class="nav-center">
                 <li><a href="#products">Ürünler</a></li>
-                <li><a href="#about">Hakkında</a></li>
-                <li><a href="#contact">İletişim</a></li>
             </ul>
-
             <div class="nav-right">
-                <a href="/cart" class="cart-btn" style="text-decoration:none;">
-    🛒
-    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
-</a>
-                <a href="{{ route('products.create') }}" class="admin-btn">⚙️ Admin Panel</a>
+                <button class="cart-btn" id="cartBtn" onclick="openCart()">
+                    🛒 <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                </button>
+                <a href="{{ route('admin.orders.index') }}" class="admin-btn">⚙️ Admin Panel</a>
             </div>
         </nav>
     </header>
 
-    <!-- ===== HERO SECTION ===== -->
     <section class="hero">
         <div class="hero-content">
             <h1>Premium Ürünleri Keşfet</h1>
-            <p>Kaliteli ve güvenilir ürünlere sahip olan online alışveriş platformumuzda siz de yerini alın.</p>
+            <p>Kaliteli ve güvenilir ürünlerle online alışverişin keyfini çıkarın.</p>
             <a href="#products" class="cta-button">Ürünleri Gör</a>
         </div>
     </section>
 
-    <!-- ===== PRODUCTS SECTION ===== -->
-    <section class="products-section" id="products">
-        <div class="section-header">
-            <h2>Öne Çıkan Ürünler</h2>
-            <p>En popüler ve en çok tercih edilen ürünlerimiz</p>
-        </div>
+  <section class="products-section" id="products">
+    <div class="section-header">
+        <h2>Öne Çıkan Ürünler</h2>
+    </div>
 
-        @if($products->count() > 0)
-            <div class="products-grid">
-                @foreach($products as $product)
-                    <div class="product-card">
-                        <div class="product-image">
+    @if($products->count() > 0)
+        <div class="products-grid">
+            @foreach($products as $product)
+                <div class="product-card">
+                    
+                    <div class="product-image">
+                        <a href="{{ route('products.show', $product->id) }}">
                             @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" 
-                                     alt="{{ $product->name }}" 
-                                     loading="lazy">
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                             @else
-                                <img src="https://via.placeholder.com/280x280?text={{ urlencode($product->name) }}" 
-                                     alt="Görsel yok">
+                                <img src="https://via.placeholder.com/280x280?text=Gorsel+Yok" alt="Görsel yok">
                             @endif
-                            @if($product->stock > 0 && $product->stock < 5)
-                                <div class="product-badge">Son Kalan!</div>
-                            @endif
-                        </div>
-                        
-                        <div class="product-info">
-                            <h3 class="product-name">{{ $product->name }}</h3>
-                            
-                            @if($product->description)
-                                <p class="product-description">
-                                    {{ Str::limit($product->description, 80) }}
-                                </p>
-                            @endif
-                            
-                            <div class="product-meta">
-                                <div class="product-price">
-                                    ₺{{ number_format($product->price, 2, ',', '.') }}
-                                </div>
-                                <div class="product-stock @if($product->stock < 5) low @endif">
-                                    @if($product->stock > 0)
-                                        Stok: {{ $product->stock }}
-                                    @else
-                                        Stok Yok
-                                    @endif
-                                </div>
-                            </div>
-
-                            <button class="add-to-cart-btn" 
-                                    onclick="addToCart({{ $product->id }}, '{{ $product->name }}')"
-                                    @if($product->stock == 0) disabled @endif>
-                                @if($product->stock > 0)
-                                    ➕ Sepete Ekle
-                                @else
-                                    ❌ Stok Yok
-                                @endif
-                            </button>
-                        </div>
+                        </a>
                     </div>
-                @endforeach
-            </div>
-        @else
-            <div class="empty-state">
-                <h2>📦 Ürün Bulunamadı</h2>
-                <p>Şu anda hiç ürün bulunmamaktadır. Lütfen daha sonra tekrar kontrol edin.</p>
-                <a href="{{ route('products.create') }}" class="cta-button">
-                    ➕ Yeni Ürün Ekle
-                </a>
-            </div>
-        @endif
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🛍️ ShopHub</h3>
-                <p style="font-size: 14px; opacity: 0.8; margin-top: 10px;">
-                    Premium ürünler ve hızlı teslimat ile online alışverişin yeni standartı.
-                </p>
-            </div>
-
-            <div class="footer-section">
-                <h3>Hızlı Bağlantılar</h3>
-                <ul>
-                    <li><a href="#products">Ürünler</a></li>
-                    <li><a href="{{ route('products.create') }}">Admin Panel</a></li>
-                    <li><a href="#contact">İletişim</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Hizmetler</h3>
-                <ul>
-                    <li><a href="#">Hızlı Kargo</a></li>
-                    <li><a href="#">Ücretsiz İade</a></li>
-                    <li><a href="#">Güvenli Ödeme</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>İletişim</h3>
-                <ul>
-                    <li><a href="mailto:info@shophub.com">📧 info@shophub.com</a></li>
-                    <li><a href="tel:+905551234567">📞 +90 555 123 45 67</a></li>
-                    <li><a href="#">📍 Istanbul, Türkiye</a></li>
-                </ul>
-            </div>
+                    
+                    <div class="product-info">
+                        <h3 class="product-name">
+                            <a href="{{ route('products.show', $product->id) }}" style="text-decoration: none; color: inherit;">
+                                {{ $product->name }}
+                            </a>
+                        </h3>
+                        
+                        <p class="product-description">{{ Str::limit($product->description, 80) }}</p>
+                        <div class="product-meta">
+                            <div class="product-price">₺{{ number_format($product->price, 2, ',', '.') }}</div>
+                            <div class="product-stock">Stok: {{ $product->stock }}</div>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}')" @if($product->stock == 0) disabled @endif>
+                            {{ $product->stock > 0 ? '➕ Sepete Ekle' : '❌ Stok Yok' }}
+                        </button>
+                    </div>
+                </div>
+            @endforeach
         </div>
+    @else
+        <div class="empty-state">
+            <h2>📦 Ürün Bulunamadı</h2>
+        </div>
+    @endif
+</section>
 
+    <footer>
         <div class="footer-bottom">
-            <p>&copy; 2024 ShopHub. Tüm hakları saklıdır. | <a href="#" style="color: var(--accent);">Gizlilik Politikası</a></p>
+            <p>&copy; 2026 ShopHub. Tüm hakları saklıdır.</p>
         </div>
     </footer>
 
     <script>
-        const API_BASE = '/api';
+        const API_BASE = '/api/cart'; // Yeni rotaya eşitlendi
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // Sepeti aç/kapat
         function openCart() {
             document.getElementById('cartModal').classList.add('active');
             document.getElementById('cartOverlay').classList.add('active');
@@ -1010,207 +801,173 @@
             document.getElementById('cartOverlay').classList.remove('active');
         }
 
-        // Overlay'e tıklanırsa sepeti kapat
         document.getElementById('cartOverlay').addEventListener('click', closeCart);
 
-        // Sepete ürün ekle
+        // Sepete Ekleme (POST /api/cart/add)
         async function addToCart(productId, productName) {
             try {
-                const response = await fetch(`${API_BASE}/cart/add`, {
+                const response = await fetch(`${API_BASE}/add`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1,
-                    }),
+                    body: JSON.stringify({ product_id: productId, quantity: 1 })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    showToast(data.message, 'success');
+                    showToast(`${productName} sepete eklendi.`);
                     updateCartCount();
+                    if (document.getElementById('cartModal').classList.contains('active')) loadCart();
                 } else {
-                    showToast(data.message, 'error');
+                    showToast(data.message || 'Yetki hatası.', 'error');
                 }
             } catch (error) {
-                showToast('Bir hata oluştu: ' + error.message, 'error');
+                showToast('Hata oluştu.', 'error');
             }
         }
 
-        // Sepeti yükle
+        // Sepet Verilerini Çekme (GET /api/cart)
         async function loadCart() {
             try {
-                const response = await fetch(`${API_BASE}/cart/`, {
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    },
+                const response = await fetch(`${API_BASE}`, {
+                    headers: { 'Accept': 'application/json' }
                 });
-
                 const data = await response.json();
-
-                if (data.success) {
-                    renderCart(data.items, data.total, data.count);
-                }
+                
+                // Laravel Controller yapına göre eşitleme (bazen doğrudan array dönebilir)
+                const items = data.items ?? data ?? [];
+                const total = data.total ?? items.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
+                
+                renderCart(items, total);
             } catch (error) {
-                console.error('Sepet yükleme hatası:', error);
+                console.error('Sepet yüklenemedi:', error);
             }
         }
 
-        // Sepeti render et
-        function renderCart(items, total, count) {
-            const cartContent = document.getElementById('cartContent');
-            const cartFooter = document.getElementById('cartFooter');
+        // Sepet Arayüzünü Çizme (Düzgün yönlendirme eklendi)
+        function renderCart(items, total) {
+            const content = document.getElementById('cartContent');
+            const footer = document.getElementById('cartFooter');
 
-            if (items.length === 0) {
-                cartContent.innerHTML = `
-                    <div class="cart-empty">
-                        <p>🛒</p>
-                        <p>Sepetiniz boş</p>
-                        <p style="font-size: 14px;">Ürün eklemek için lütfen yukarıya gidin.</p>
-                    </div>
-                `;
-                cartFooter.innerHTML = '';
+            if (!items || items.length === 0) {
+                content.innerHTML = `<div class="cart-empty"><p>🛒</p><p>Sepetiniz boş</p></div>`;
+                footer.innerHTML = '';
                 return;
             }
 
-            cartContent.innerHTML = items.map(item => `
-                <div class="cart-item" data-cart-id="${item.id}">
-                    <div class="cart-item-image">
-                        <img src="${item.product.image ? '/storage/' + item.product.image : 'https://via.placeholder.com/80x80'}" 
-                             alt="${item.product.name}">
-                    </div>
-                    <div class="cart-item-details">
-                        <div class="cart-item-name">${item.product.name}</div>
-                        <div class="cart-item-price">₺${(item.price * item.quantity).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</div>
-                        <div class="cart-item-controls">
-                            <div class="quantity-control">
-                                <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
-                                <input type="number" value="${item.quantity}" readonly>
-                                <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+            content.innerHTML = items.map(item => {
+                const name = item.product?.name ?? "Ürün";
+                const img = item.product?.image ? `/storage/${item.product.image}` : 'https://via.placeholder.com/80x80';
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-image"><img src="${img}"></div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${name}</div>
+                            <div class="cart-item-price">₺${(item.price * item.quantity).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</div>
+                            <div class="cart-item-controls">
+                                <div class="quantity-control">
+                                    <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
+                                    <input type="number" value="${item.quantity}" readonly>
+                                    <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                                </div>
+                                <button class="remove-btn" onclick="removeFromCart(${item.id})">Kaldır</button>
                             </div>
-                            <button class="remove-btn" onclick="removeFromCart(${item.id})">Kaldır</button>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
-            cartFooter.innerHTML = `
+            // ARTIK SEPET SAYFASINA DÜZGÜN YÖNLENDİRİYOR
+            footer.innerHTML = `
                 <div class="cart-summary">
-                    <div class="cart-summary-row">
-                        <span>Ürün Sayısı:</span>
-                        <span>${items.length}</span>
-                    </div>
-                    <div class="cart-summary-row">
-                        <span>Kargo:</span>
-                        <span>₺50,00</span>
-                    </div>
                     <div class="cart-summary-row total">
                         <span>Toplam:</span>
-                        <span>₺${(total + 50).toLocaleString('tr-TR', {minimumFractionDigits: 2})}</span>
+                        <span>₺${total.toLocaleString('tr-TR', {minimumFractionDigits: 2})}</span>
                     </div>
                 </div>
-                <button class="checkout-btn" onclick="checkout()">💳 Satın Al</button>
+                <a href="/cart" class="checkout-btn">Sepete Git & Sipariş Et</a>
                 <button class="clear-cart-btn" onclick="clearCart()">Sepeti Temizle</button>
             `;
         }
 
-        // Miktarı güncelle
+        // Miktar Güncelleme (PUT /api/cart/update/{id})
         async function updateQuantity(cartId, quantity) {
             if (quantity < 1) {
                 removeFromCart(cartId);
                 return;
             }
-
             try {
-                const response = await fetch(`${API_BASE}/cart/${cartId}/update`, {
-                    method: 'POST',
+                const response = await fetch(`${API_BASE}/update/${cartId}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
-                    body: JSON.stringify({ quantity }),
+                    body: JSON.stringify({ quantity })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
                     loadCart();
-                } else {
-                    showToast(data.message, 'error');
+                    updateCartCount();
                 }
             } catch (error) {
-                showToast('Bir hata oluştu: ' + error.message, 'error');
+                console.error(error);
             }
         }
 
-        // Sepetten kaldır
+        // Ürün Silme (DELETE /api/cart/remove/{id})
         async function removeFromCart(cartId) {
             try {
-                const response = await fetch(`${API_BASE}/cart/${cartId}/remove`, {
+                const response = await fetch(`${API_BASE}/remove/${cartId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    },
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    showToast(data.message, 'success');
                     loadCart();
                     updateCartCount();
-                } else {
-                    showToast(data.message, 'error');
+                    showToast('Ürün sepetten kaldırıldı.');
                 }
             } catch (error) {
-                showToast('Bir hata oluştu: ' + error.message, 'error');
+                console.error(error);
             }
         }
 
-        // Sepeti temizle
+        // Tüm Sepeti Temizle (DELETE /api/cart/clear)
         async function clearCart() {
-            if (!confirm('Sepeti temizlemek istediğinizden emin misiniz?')) {
-                return;
-            }
-
             try {
-                const response = await fetch(`${API_BASE}/cart/clear`, {
+                const response = await fetch(`${API_BASE}/clear`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    },
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    showToast(data.message, 'success');
                     loadCart();
                     updateCartCount();
-                } else {
-                    showToast(data.message, 'error');
+                    showToast('Sepet temizlendi.');
                 }
             } catch (error) {
-                showToast('Bir hata oluştu: ' + error.message, 'error');
+                console.error(error);
             }
         }
 
-        // Sepet sayısını güncelle
+        // Sayaç Güncelleme (GET /api/cart/count)
         async function updateCartCount() {
             try {
-                const response = await fetch(`${API_BASE}/cart/count`, {
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                    },
+                const response = await fetch(`${API_BASE}/count`, {
+                    headers: { 'Accept': 'application/json' }
                 });
-
                 const data = await response.json();
                 const badge = document.getElementById('cartBadge');
-
                 if (data.count > 0) {
                     badge.textContent = data.count;
                     badge.style.display = 'flex';
@@ -1218,31 +975,22 @@
                     badge.style.display = 'none';
                 }
             } catch (error) {
-                console.error('Sepet sayısı güncellenirken hata:', error);
+                console.error(error);
             }
         }
 
-        // Satın al
-        function checkout() {
-            alert('Ödeme sayfasına yönlendiriliyorsunuz...');
-            // Burada payment gateway'e yönlendir
-        }
-
-        // Toast notification
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             document.body.appendChild(toast);
-
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 2000);
         }
 
-        // Sayfa yüklendiğinde sepet sayısını güncelle
-        window.addEventListener('load', updateCartCount);
+        document.addEventListener('DOMContentLoaded', updateCartCount);
     </script>
 </body>
 </html>
