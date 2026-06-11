@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopHub - Premium Ürünler</title>
+    <title>ShopHub - Premium Products</title>
     
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -714,7 +714,7 @@
 
     <div class="cart-modal" id="cartModal">
         <div class="cart-modal-header">
-            <h2>🛒 Sepetim</h2>
+            <h2>🛒 Carts</h2>
             <button class="cart-close-btn" onclick="closeCart()">✕</button>
         </div>
         <div class="cart-content" id="cartContent"></div>
@@ -725,7 +725,7 @@
         <nav>
             <a href="{{ route('products.index') }}" class="logo">ShopHub</a>
             <ul class="nav-center">
-                <li><a href="#products">Ürünler</a></li>
+                <li><a href="#products">Products</a></li>
             </ul>
             <div class="nav-right">
                 <button class="cart-btn" id="cartBtn" onclick="openCart()">
@@ -738,28 +738,36 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>Premium Ürünleri Keşfet</h1>
-            <p>Kaliteli ve güvenilir ürünlerle online alışverişin keyfini çıkarın.</p>
-            <a href="#products" class="cta-button">Ürünleri Gör</a>
+            <h1>Discover Premium Products</h1>
+            <p>Enjoy high-quality and reliable products for your online shopping experience.</p>
+            <a href="#products" class="cta-button">View Products</a>
         </div>
     </section>
 
     <section class="products-section" id="products">
         <div class="section-header">
-            <h2>Öne Çıkan Ürünler</h2>
+            <h2>Featured Products</h2>
         </div>
 
         <div class="category-slider-wrapper">
             <div class="category-slider">
                 <a href="{{ route('products.index') }}" class="category-item {{ !request()->has('category') || request('category') == '' ? 'active' : '' }}">
-                    📦 Tüm Ürünler
+                     All Products
                 </a>
 
-                @foreach($categories as $category)
-                    <a href="?category={{ $category->id }}" class="category-item {{ request('category') == $category->id ? 'active' : '' }}">
-                        ✨ {{ $category->name }}
-                    </a>
-                @endforeach
+           @foreach($categories as $category)
+    @if(in_array($category->id, [1, 2, 3]))
+        <a href="?category={{ $category->id }}" class="category-item {{ request('category') == $category->id ? 'active' : '' }}">
+            @if($category->id == 1)
+                 Electronics
+            @elseif($category->id == 2)
+                 Major Appliances
+            @elseif($category->id == 3)
+                 Small Home Appliances
+            @endif
+        </a>
+    @endif
+@endforeach
             </div>
         </div>
 
@@ -788,10 +796,10 @@
                             <p class="product-description">{{ Str::limit($product->description, 80) }}</p>
                             <div class="product-meta">
                                 <div class="product-price">₺{{ number_format($product->price, 2, ',', '.') }}</div>
-                                <div class="product-stock">Stok: {{ $product->stock }}</div>
+                                <div class="product-stock">Stock: {{ $product->stock }}</div>
                             </div>
                             <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}')" @if($product->stock == 0) disabled @endif>
-                                {{ $product->stock > 0 ? '➕ Sepete Ekle' : '❌ Stok Yok' }}
+                                {{ $product->stock > 0 ? '➕ Add to Cart' : '❌ Out of Stock' }}
                             </button>
                         </div>
                     </div>
@@ -799,14 +807,14 @@
             </div>
         @else
             <div class="empty-state" style="text-align: center; padding: 40px 0; color: var(--text-light);">
-                <h2>📦 Bu Kategoride Ürün Bulunmuyor</h2>
+                <h2>📦 No Products in This Category</h2>
             </div>
         @endif
     </section>
 
     <footer>
         <div class="footer-bottom">
-            <p>&copy; 2026 ShopHub. Tüm hakları saklıdır.</p>
+            <p>&copy; 2026 ShopHub. All rights reserved.</p>
         </div>
     </footer>
 
@@ -839,7 +847,7 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    showToast(`${productName} sepete eklendi.`);
+                    showToast(`${productName} added to cart.`);
                     updateCartCount();
                     if (document.getElementById('cartModal').classList.contains('active')) loadCart();
                 } else {

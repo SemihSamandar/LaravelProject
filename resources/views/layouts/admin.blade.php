@@ -583,21 +583,21 @@
         <nav class="sidebar-nav">
             <!-- Main Section -->
             <div class="nav-section">
-                <div class="nav-section-title">Ürün Yönetimi</div>
+                <div class="nav-section-title">Product Management</div>
 
                 <a href="{{ route('products.index') }}" class="nav-item">
                   <span class="nav-item-icon">📦</span>
-                    <span class="nav-item-text">Ürünler</span>
+                    <span class="nav-item-text">Products</span>
                 </a>
 
                 <a href="{{ route('products.create') }}" class="nav-item">
                     <span class="nav-item-icon">➕</span>
-                    <span class="nav-item-text">Yeni Ürün Ekle</span>
+                    <span class="nav-item-text">Add New Product</span>
                 </a>
 
 <a href="{{ route('admin.orders.index') }}" class="nav-item">
     <span class="nav-item-icon">📦</span>
-    <span class="nav-item-text">Siparişler</span>
+    <span class="nav-item-text">Orders</span>
 </a>
 
             </div>
@@ -625,7 +625,7 @@
             <div class="topbar-left">
                 <button class="menu-toggle">☰</button>
                 <div class="breadcrumb">
-                    <a href="{{ route('products.index') }}">Ürünler</a>
+                    <a href="{{ route('products.index') }}">Products</a>
                     <span>/</span>
                     <span>@yield('breadcrumb', 'Sayfa')</span>
                 </div>
