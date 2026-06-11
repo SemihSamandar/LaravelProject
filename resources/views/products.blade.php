@@ -847,14 +847,14 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    showToast(`${productName} added to cart.`);
+                    showToast(`${productName} was successfully added to your cart!`, 'success');
                     updateCartCount();
                     if (document.getElementById('cartModal').classList.contains('active')) loadCart();
                 } else {
-                    showToast(data.message || 'Yetki hatası.', 'error');
+                    showToast(data.message || 'Permission error.', 'error');
                 }
             } catch (error) {
-                showToast('Hata oluştu.', 'error');
+                showToast('An error occurred.', 'error');
             }
         }
 
@@ -870,7 +870,7 @@
                 
                 renderCart(items, total);
             } catch (error) {
-                console.error('Sepet yüklenemedi:', error);
+                console.error('Cart could not be loaded:', error);
             }
         }
 
@@ -879,13 +879,13 @@
             const footer = document.getElementById('cartFooter');
 
             if (!items || items.length === 0) {
-                content.innerHTML = `<div class="cart-empty"><p>🛒</p><p>Sepetiniz boş</p></div>`;
+                content.innerHTML = `<div class="cart-empty"><p>🛒</p><p>Your cart is empty</p></div>`;
                 footer.innerHTML = '';
                 return;
             }
 
             content.innerHTML = items.map(item => {
-                const name = item.product?.name ?? "Ürün";
+                const name = item.product?.name ?? "Product not found";
                 const img = item.product?.image ? `/storage/${item.product.image}` : 'https://via.placeholder.com/80x80';
                 return `
                     <div class="cart-item">
@@ -899,7 +899,7 @@
                                     <input type="number" value="${item.quantity}" readonly>
                                     <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
                                 </div>
-                                <button class="remove-btn" onclick="removeFromCart(${item.id})">Kaldır</button>
+                                <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -909,12 +909,12 @@
             footer.innerHTML = `
                 <div class="cart-summary">
                     <div class="cart-summary-row total">
-                        <span>Toplam:</span>
+                        <span>Total:</span>
                         <span>₺${total.toLocaleString('tr-TR', {minimumFractionDigits: 2})}</span>
                     </div>
                 </div>
-                <a href="/cart" class="checkout-btn">Sepete Git & Sipariş Et</a>
-                <button class="clear-cart-btn" onclick="clearCart()">Sepeti Temizle</button>
+                <a href="/cart" class="checkout-btn">Go to Cart & Order</a>
+                <button class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
             `;
         }
 
@@ -956,7 +956,7 @@
                 if (data.success) {
                     loadCart();
                     updateCartCount();
-                    showToast('Ürün sepetten kaldırıldı.');
+                    showToast('Product removed from cart.', 'success');
                 }
             } catch (error) {
                 console.error(error);
@@ -976,7 +976,7 @@
                 if (data.success) {
                     loadCart();
                     updateCartCount();
-                    showToast('Sepet temizlendi.');
+                    showToast('Cart cleared.', 'success');
                 }
             } catch (error) {
                 console.error(error);
