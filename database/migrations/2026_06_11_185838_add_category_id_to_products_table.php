@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+  public function up()
+{
+    Schema::table('products', function (Blueprint $table) {
+        // Eğer kategoriler tablon varsa foreignId kullanabilirsin. 
+        // Basitlik açısından veya şimdilik doğrudan string/id olarak ekliyoruz:
+        $table->unsignedBigInteger('category_id')->nullable()->after('id');
+        
+        // Eğer categories tablon hazırsa şu satırı da ekleyebilirsin:
+        // $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+    });
+}
+
+public function down()
+{
+    Schema::table('products', function (Blueprint $table) {
+        $table->dropColumn('category_id');
+    });
+}
+};

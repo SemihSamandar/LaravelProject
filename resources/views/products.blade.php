@@ -166,7 +166,53 @@
             background: var(--accent);
             color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 166px rgba(212, 175, 55, 0.2);
+        }
+
+        /* ===== KATEGORİ KAYDIRILABİLİR MENÜ ===== */
+        .category-slider-wrapper {
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .category-slider {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 2px 15px 2px;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .category-slider::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        .category-item {
+            display: inline-block;
+            padding: 10px 24px;
+            background-color: var(--secondary);
+            color: var(--text-light);
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .category-item:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .category-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: var(--secondary);
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         /* ===== CART MODAL ===== */
@@ -481,7 +527,7 @@
 
         .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
         }
 
         .section-header h2 {
@@ -649,43 +695,6 @@
             margin-top: 80px;
         }
 
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-section h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--accent);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 12px;
-        }
-
-        .footer-section a {
-            color: var(--secondary);
-            text-decoration: none;
-            font-size: 14px;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            opacity: 1;
-            color: var(--accent);
-        }
-
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 30px;
@@ -735,51 +744,65 @@
         </div>
     </section>
 
-  <section class="products-section" id="products">
-    <div class="section-header">
-        <h2>Öne Çıkan Ürünler</h2>
-    </div>
+    <section class="products-section" id="products">
+        <div class="section-header">
+            <h2>Öne Çıkan Ürünler</h2>
+        </div>
 
-    @if($products->count() > 0)
-        <div class="products-grid">
-            @foreach($products as $product)
-                <div class="product-card">
-                    
-                    <div class="product-image">
-                        <a href="{{ route('products.show', $product->id) }}">
-                            @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                            @else
-                                <img src="https://via.placeholder.com/280x280?text=Gorsel+Yok" alt="Görsel yok">
-                            @endif
-                        </a>
-                    </div>
-                    
-                    <div class="product-info">
-                        <h3 class="product-name">
-                            <a href="{{ route('products.show', $product->id) }}" style="text-decoration: none; color: inherit;">
-                                {{ $product->name }}
-                            </a>
-                        </h3>
+        <div class="category-slider-wrapper">
+            <div class="category-slider">
+                <a href="{{ route('products.index') }}" class="category-item {{ !request()->has('category') || request('category') == '' ? 'active' : '' }}">
+                    📦 Tüm Ürünler
+                </a>
+
+                @foreach($categories as $category)
+                    <a href="?category={{ $category->id }}" class="category-item {{ request('category') == $category->id ? 'active' : '' }}">
+                        ✨ {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        @if($products->count() > 0)
+            <div class="products-grid">
+                @foreach($products as $product)
+                    <div class="product-card">
                         
-                        <p class="product-description">{{ Str::limit($product->description, 80) }}</p>
-                        <div class="product-meta">
-                            <div class="product-price">₺{{ number_format($product->price, 2, ',', '.') }}</div>
-                            <div class="product-stock">Stok: {{ $product->stock }}</div>
+                        <div class="product-image">
+                            <a href="{{ route('products.show', $product->id) }}">
+                                @if($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                                @else
+                                    <img src="https://via.placeholder.com/280x280?text=Gorsel+Yok" alt="Görsel yok">
+                                @endif
+                            </a>
                         </div>
-                        <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}')" @if($product->stock == 0) disabled @endif>
-                            {{ $product->stock > 0 ? '➕ Sepete Ekle' : '❌ Stok Yok' }}
-                        </button>
+                        
+                        <div class="product-info">
+                            <h3 class="product-name">
+                                <a href="{{ route('products.show', $product->id) }}" style="text-decoration: none; color: inherit;">
+                                    {{ $product->name }}
+                                </a>
+                            </h3>
+                            
+                            <p class="product-description">{{ Str::limit($product->description, 80) }}</p>
+                            <div class="product-meta">
+                                <div class="product-price">₺{{ number_format($product->price, 2, ',', '.') }}</div>
+                                <div class="product-stock">Stok: {{ $product->stock }}</div>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}')" @if($product->stock == 0) disabled @endif>
+                                {{ $product->stock > 0 ? '➕ Sepete Ekle' : '❌ Stok Yok' }}
+                            </button>
+                        </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
-    @else
-        <div class="empty-state">
-            <h2>📦 Ürün Bulunamadı</h2>
-        </div>
-    @endif
-</section>
+                @endforeach
+            </div>
+        @else
+            <div class="empty-state" style="text-align: center; padding: 40px 0; color: var(--text-light);">
+                <h2>📦 Bu Kategoride Ürün Bulunmuyor</h2>
+            </div>
+        @endif
+    </section>
 
     <footer>
         <div class="footer-bottom">
@@ -788,7 +811,7 @@
     </footer>
 
     <script>
-        const API_BASE = '/api/cart'; // Yeni rotaya eşitlendi
+        const API_BASE = '/api/cart';
 
         function openCart() {
             document.getElementById('cartModal').classList.add('active');
@@ -803,7 +826,6 @@
 
         document.getElementById('cartOverlay').addEventListener('click', closeCart);
 
-        // Sepete Ekleme (POST /api/cart/add)
         async function addToCart(productId, productName) {
             try {
                 const response = await fetch(`${API_BASE}/add`, {
@@ -828,7 +850,6 @@
             }
         }
 
-        // Sepet Verilerini Çekme (GET /api/cart)
         async function loadCart() {
             try {
                 const response = await fetch(`${API_BASE}`, {
@@ -836,7 +857,6 @@
                 });
                 const data = await response.json();
                 
-                // Laravel Controller yapına göre eşitleme (bazen doğrudan array dönebilir)
                 const items = data.items ?? data ?? [];
                 const total = data.total ?? items.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
                 
@@ -846,7 +866,6 @@
             }
         }
 
-        // Sepet Arayüzünü Çizme (Düzgün yönlendirme eklendi)
         function renderCart(items, total) {
             const content = document.getElementById('cartContent');
             const footer = document.getElementById('cartFooter');
@@ -879,7 +898,6 @@
                 `;
             }).join('');
 
-            // ARTIK SEPET SAYFASINA DÜZGÜN YÖNLENDİRİYOR
             footer.innerHTML = `
                 <div class="cart-summary">
                     <div class="cart-summary-row total">
@@ -892,7 +910,6 @@
             `;
         }
 
-        // Miktar Güncelleme (PUT /api/cart/update/{id})
         async function updateQuantity(cartId, quantity) {
             if (quantity < 1) {
                 removeFromCart(cartId);
@@ -918,7 +935,6 @@
             }
         }
 
-        // Ürün Silme (DELETE /api/cart/remove/{id})
         async function removeFromCart(cartId) {
             try {
                 const response = await fetch(`${API_BASE}/remove/${cartId}`, {
@@ -939,7 +955,6 @@
             }
         }
 
-        // Tüm Sepeti Temizle (DELETE /api/cart/clear)
         async function clearCart() {
             try {
                 const response = await fetch(`${API_BASE}/clear`, {
@@ -960,7 +975,6 @@
             }
         }
 
-        // Sayaç Güncelleme (GET /api/cart/count)
         async function updateCartCount() {
             try {
                 const response = await fetch(`${API_BASE}/count`, {

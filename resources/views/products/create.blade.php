@@ -211,6 +211,19 @@
             </div>
 
             <div class="form-group">
+    <label>📁 Product Category</label>
+    <select name="category_id" required style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-white;">
+        <option value="" disabled selected>Select a category</option>
+        <!-- Controller'dan $categories değişkenini gönderiyorsan döngüye alabilirsin -->
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+            <div class="form-group">
                 <label>🖼️ Product Image</label>
                 <div class="image-upload-area" id="uploadArea">
                     Click or drag image
