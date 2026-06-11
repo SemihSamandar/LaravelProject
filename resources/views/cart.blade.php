@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sepetim - ShopHub</title>
+    <title>Carts - ShopHub</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -599,79 +599,79 @@
         <nav>
             <a href="/" class="logo">ShopHub</a>
             <div class="nav-links">
-                <a href="/">← Ana Sayfa</a>
-                <a href="/cart">🛒 Sepet</a>
+                <a href="/">← Home </a>
+                <a href="/cart">🛒 Carts</a>
             </div>
         </nav>
     </header>
 
     <div class="breadcrumb">
-        <a href="/">Ana Sayfa</a> / <span>Sepetim</span>
+        <a href="/">Home</a> / <span>Carts</span>
     </div>
 
     <div class="container">
         <div class="cart-header">
-            <h1>Sepetim</h1>
-            <p>Siparişinizi tamamlamak için aşağıdaki ürünleri kontrol edin</p>
+            <h1>Carts</h1>
+            <p>Review the items in your cart before checkout</p>
         </div>
 
         <div class="cart-layout">
             <div id="cart-container" class="cart-items">
                 <div style="padding: 40px; text-align: center; color: var(--text-light);">
-                    <p>Sepet yükleniyor...</p>
+                    <p>Carts are loading...</p>
                 </div>
             </div>
 
             <div class="cart-summary">
-                <div class="summary-title">Teslimat Bilgileri</div>
+                <div class="summary-title">Checkout Information</div>
                 <div class="checkout-form">
                     <div class="form-group">
-                        <label for="customer-name">Ad Soyad</label>
-                        <input type="text" id="customer-name" class="form-control" placeholder="Müşteri adı ve soyadı">
+                        <label for="customer-name">Name Surname</label>
+                        <input type="text" id="customer-name" class="form-control" placeholder="Customer name and surname">
                     </div>
                     <div class="form-group">
-                        <label for="customer-phone">Telefon Numarası</label>
+                        <label for="customer-phone">Phone Number</label>
                         <input type="tel" id="customer-phone" class="form-control" placeholder="0555 XXXXXXX">
                     </div>
                     <div class="form-group">
-                        <label for="customer-address">Teslimat Adresi</label>
-                        <textarea id="customer-address" class="form-control" placeholder="Açık adresiniz..."></textarea>
+                        <label for="customer-address">Delivery Address</label>
+                        <textarea id="customer-address" class="form-control" placeholder="Your full address..."></textarea>
                     </div>
                 </div>
 
-                <div class="summary-title">Sipariş Özeti</div>
+                <div class="summary-title">Order Summary</div>
 
                 <div class="summary-row">
-                    <span>Ara Toplam</span>
+                    <span>Subtotal</span>
                     <span id="subtotal">₺0,00</span>
                 </div>
 
                 <div class="summary-row">
-                    <span>Kargo</span>
+                    <span>Shipping</span>
                     <span id="shipping">₺50,00</span>
                 </div>
 
                 <div class="summary-row">
-                    <span>Vergi (%18)</span>
+                    <span>Tax (%18)</span>
                     <span id="tax">₺0,00</span>
                 </div>
 
                 <div class="summary-row total">
-                    <span>Toplam</span>
+                    <span>Total</span>
                     <span id="total-price">₺0,00</span>
                 </div>
 
                 <button class="checkout-btn" onclick="checkout()">
-                    💳 Satın Al
+                    💳 Checkout
                 </button>
 
                 <div class="promo-container">
-                    <input type="text" class="promo-input" placeholder="Kupon kodu" id="promo-code">
-                    <button class="promo-btn" onclick="applyPromo()">Uygula</button>
+                    <input type="text" class="promo-input" placeholder="Promo code" id="promo-code">
+                    <button class="promo-btn" onclick="applyPromo()">Apply</button>
                 </div>
 
                 <div class="shipping-info">
-                    ✓ Ücretsiz iade 30 gün içinde
+                    ✓ Free returns within 30 days
                 </div>
             </div>
         </div>

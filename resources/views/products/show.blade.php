@@ -392,7 +392,7 @@
             <a href="{{ route('products.index') }}" class="logo">ShopHub</a>
             <div class="nav-right">
                 <a href="{{ route('products.index') }}" class="back-to-shop">
-                    ← Mağazaya Dön
+                    ← Back to Shop
                 </a>
             </div>
         </nav>
@@ -408,41 +408,41 @@
             @endif
 
             @if($product->stock > 0 && $product->stock < 5)
-                <div class="detail-badge">Tükenmek Üzere!</div>
+                <div class="detail-badge">Almost Out of Stock!</div>
             @endif
         </section>
 
         <section class="product-detail-info">
-            <span class="detail-tag">Premium Koleksiyon</span>
+            <span class="detail-tag">Premium Collection</span>
             <h1 class="detail-name">{{ $product->name }}</h1>
             
             <div class="detail-price">
                 ₺{{ number_format($product->price, 2, ',', '.') }}
-                <span>KDV Dahil</span>
+                <span>VAT Included</span>
             </div>
 
             <div class="status-row">
-                Durum:
+                Status:
                 @if($product->stock >= 5)
                     <div class="status-indicator in-stock">
-                        <span>●</span> Stokta Var ({{ $product->stock }} adet)
+                        <span>●</span> In Stock ({{ $product->stock }} pieces available)
                     </div>
                 @elseif($product->stock > 0 && $product->stock < 5)
                     <div class="status-indicator low-stock">
-                        <span>●</span> Son {{ $product->stock }} Ürün!
+                        <span>●</span> Last {{ $product->stock }} Products!
                     </div>
                 @else
                     <div class="status-indicator no-stock">
-                        <span>●</span> Stok Tükendi
+                        <span>●</span> Out of Stock
                     </div>
                 @endif
             </div>
 
             <div class="detail-divider"></div>
 
-            <h2 class="detail-description-title">Ürün Açıklaması</h2>
+            <h2 class="detail-description-title">Product Description</h2>
             <p class="detail-description">
-                {{ $product->description ?? 'Bu lüks ürünümüz hakkında detaylı açıklama çok yakında eklenecektir. Şık tasarımı ve premium malzeme kalitesiyle hayatınıza değer katmak için tasarlandı.' }}
+                {{ $product->description ?? 'Detailed description for this premium product will be added soon. Designed with a sleek look and premium material quality to add value to your life.' }}
             </p>
 
             <div class="detail-divider"></div>
@@ -460,25 +460,25 @@
                         onclick="processAddToCart({{ $product->id }}, '{{ $product->name }}')"
                         @if($product->stock == 0) disabled @endif>
                     @if($product->stock > 0)
-                        🛒 Sepete Ekle
+                        🛒 Add to Cart
                     @else
-                        ❌ Stokta Yok
+                        ❌ Out of Stock
                     @endif
                 </button>
             </div>
 
             <div class="features-grid">
                 <div class="feature-item">
-                    <span>🚚</span> Ücretsiz ve Hızlı Kargo
+                    <span>🚚</span> Free and Fast Shipping
                 </div>
                 <div class="feature-item">
-                    <span>🛡️</span> 2 Yıl Resmi Üretici Garantisi
+                    <span>🛡️</span> 2-Year Official Manufacturer Warranty
                 </div>
                 <div class="feature-item">
-                    <span>🔄</span> 14 Gün Koşulsuz İade Hakkı
+                    <span>🔄</span> 14-Day No-Questions-Asked Return Policy
                 </div>
                 <div class="feature-item">
-                    <span>💳</span> Güvenli Ödeme Altyapısı
+                    <span>💳</span> Secure Payment Infrastructure
                 </div>
             </div>
 
@@ -524,12 +524,12 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showToast(`${finalQuantity} adet ${productName} başarıyla sepetinize eklendi!`, 'success');
+                    showToast(`${finalQuantity} pieces of ${productName} were successfully added to your cart!`, 'success');
                 } else {
                     showToast(data.message, 'error');
                 }
             } catch (error) {
-                showToast('Bir hata oluştu: ' + error.message, 'error');
+                showToast('An error occurred: ' + error.message, 'error');
             }
         }
 
